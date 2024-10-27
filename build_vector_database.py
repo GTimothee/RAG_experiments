@@ -13,38 +13,38 @@ LIMIT_DB_SIZE = 1000
 
 
 def make_db(emb, persist_directory):
-    print('Preparing chunks...')
+    print("Preparing chunks...")
     documents = DatasetMaker.make()
     print(f"Total nb chunks: {len(documents)}")
-    
+
     if LIMIT_DB_SIZE:
         print(f"LIMIT_DB_SIZE={LIMIT_DB_SIZE}. Truncating.")
         documents = documents[:LIMIT_DB_SIZE]
 
-    print(f'Building DB at {persist_directory}...')
+    print(f"Building DB at {persist_directory}...")
     chroma_db = Chroma(
         collection_name="langchain",
         embedding_function=emb,
-        persist_directory=persist_directory
+        persist_directory=persist_directory,
     )
     for i in range(0, len(documents), 100):  # Loading in chunks to avoid OOM error
-        indices = i, i+100
+        indices = i, i + 100
         print(f"\t- Ingesting docs {indices[0]} to {indices[1]}...")
-        batch = documents[indices[0]:indices[1]]
+        batch = documents[indices[0] : indices[1]]
         if not len(batch):
             break
         uuids = [str(uuid4()) for _ in range(len(batch))]
         chroma_db.add_documents(batch, ids=uuids)
     print("Done.")
     return chroma_db
-    
+
 
 def get_db(persist_directory: str):
     emb = OpenAIEmbeddings(
         openai_api_base=os.getenv("embedding_OPENAI_BASE_URL"),
         openai_api_key=os.getenv("embedding_OPENAI_API_KEY"),
         model="gte-large-en-v1.5",
-        chunk_size=32
+        chunk_size=32,
     )
 
     if not os.path.isdir(persist_directory):
@@ -75,8 +75,13 @@ class DatasetMaker:
     def make(chunk_size=512):
 
         print("\t- Loading data from file...")
-        dataset = datasets.load_dataset("csv", data_files="huggingface_doc.csv")["train"]
-        dataset = [Document(page_content=doc["text"], metadata={"source": doc["source"]}) for doc in tqdm(dataset)]
+        dataset = datasets.load_dataset("csv", data_files="huggingface_doc.csv")[
+            "train"
+        ]
+        dataset = [
+            Document(page_content=doc["text"], metadata={"source": doc["source"]})
+            for doc in tqdm(dataset)
+        ]
         print(f"\t- Dataset size: {len(dataset)}")
 
         print("\t- Splitting...")
@@ -102,11 +107,13 @@ class DatasetMaker:
 
 if __name__ == "__main__":
     load_dotenv()
-    persist_directory = f"./chroma_db_{LIMIT_DB_SIZE}" if LIMIT_DB_SIZE is not None else "./chroma_db"    
+    persist_directory = (
+        f"./chroma_db_{LIMIT_DB_SIZE}" if LIMIT_DB_SIZE is not None else "./chroma_db"
+    )
     chroma = get_db(persist_directory=persist_directory)
 
     # test
-    docs = chroma.similarity_search(query="what do you know about huggingface endpoint?", k=5)
+    docs = chroma.similarity_search(
+        query="what do you know about huggingface endpoint?", k=5
+    )
     print(docs)
-        
-    
