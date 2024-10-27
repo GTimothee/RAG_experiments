@@ -6,6 +6,8 @@
 2. Build the db
 ```python build_vector_database.py```
 
+To run a basic RAG test
+```python rag.py```
 ## Blog posts
 
 ### RAG evaluation
@@ -14,3 +16,4 @@
 ```python test_procedure_for_rag/generate_qa_pairs.py data/chroma_db_1000/ data/```
 2. Generate the answers using the RAG
 ```python test_procedure_for_rag/generate_answers.py data/chroma_db_1000/ data/qa_dataset_limit\=10.csv data/```
+
