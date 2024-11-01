@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from uuid import uuid4
 
+import datasets
 from tqdm import tqdm
 from dotenv import load_dotenv
 from langchain_core.documents import Document
@@ -108,7 +109,7 @@ class DatasetMaker:
 if __name__ == "__main__":
     load_dotenv()
     persist_directory = (
-        f"./chroma_db_{LIMIT_DB_SIZE}" if LIMIT_DB_SIZE is not None else "./chroma_db"
+        f"data/chroma_db_{LIMIT_DB_SIZE}" if LIMIT_DB_SIZE is not None else "./chroma_db"
     )
     chroma = get_db(persist_directory=persist_directory)
 
