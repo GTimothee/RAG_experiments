@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 from whoosh.index import open_dir
-from whoosh.qparser import MultifieldParser
+from whoosh.qparser import QueryParser
 from whoosh import scoring
 from whoosh import qparser
 from whoosh.lang.porter import stem
@@ -20,8 +20,8 @@ class KeywordRetriever:
         self.stop_words = set(stopwords.words("english"))
         self.stop_words.add("?")
         self.ix = open_dir(index_dirpath)
-        self.parser = MultifieldParser(
-            ["content"],
+        self.parser = QueryParser(
+            "content",
             self.ix.schema,
             group=qparser.OrGroup.factory(0.9),
         )
